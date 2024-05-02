@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -xe
+
+gcc -o app src/Main.c src/FileHandling.c src/Huffman.c -Wall -Wextra
+
+./app jsonExample.txt $1
