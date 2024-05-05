@@ -20,11 +20,11 @@ def rebuild_huffman(json_data):
     return root
 
 def build_tree(node_data):
-    char = node_data['char']
-    freq = int(node_data['freq'])
+    char = node_data['c']
+    freq = int(node_data['f'])
     if char == '$':
-        left = build_tree(node_data['left'])
-        right = build_tree(node_data['right'])
+        left = build_tree(node_data['l'])
+        right = build_tree(node_data['r'])
         return Node(char='$', freq=freq, left=left, right=right)
     else:
         return Node(char=char, freq=freq)

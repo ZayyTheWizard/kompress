@@ -49,23 +49,37 @@ int main(int _, char *argv[])
             Frequency[i] = curr->Frequency;
             curr = curr->next;
         }
+        freeList(ListPtr);
 
         Node *root = buildHuffmanTree(Letters, Frequency, count);
 
         char *encodedString = encodeString(root, FileAsStr);
         JSONformatter(argv[1], encodedString, root);
 
+        freeTree(root);
+        free(encodedString);
         printf("Succesfly Encoded File\n");
     }
     else if (strcmp(argv[2], "decode") == 0)
     {
         char *message = JSONmessage(argv[1]);
+        if (message == NULL)
+        {
+            // Handle error
+            printf("Error decoding file\n");
+            return -1;
+        }
+        else
+        {
+            // Print the result
+            OutputDecodedFile(argv[1], message);
+            printf("Successfully Decoded File\n");
 
-        // Print the result
-        OutputDecodedFile(argv[1], message);
-        printf("Successfully Decoded File\n");
+            free(message);
+        }
     }
 
+    free(FileAsStr);
     return 0;
 }
 

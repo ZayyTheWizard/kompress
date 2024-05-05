@@ -11,85 +11,53 @@ Node *newNode(char letter, int frequency)
     return node;
 }
 
-// Function to create a new priority queue node
-PriorityQueueNode *newPriorityQueueNode(Node *node)
-{
-    PriorityQueueNode *pqNode = (PriorityQueueNode *)malloc(sizeof(PriorityQueueNode));
-    pqNode->node = node;
-    pqNode->next = NULL;
-    return pqNode;
-}
-
-// Function to insert a new node into the priority queue
-void insert(PriorityQueueNode **head, Node *node)
-{
-    PriorityQueueNode *start = (*head);
-
-    // Create a new priority queue node
-    PriorityQueueNode *temp = newPriorityQueueNode(node);
-
-    // Special case: The priority of the new node is less than the head
-    if ((*head) == NULL || (*head)->node->frequency >= node->frequency)
-    {
-        temp->next = *head;
-        (*head) = temp;
-    }
-    else
-    {
-        // Locate the node before the point of insertion
-        while (start->next != NULL && start->next->node->frequency < node->frequency)
-        {
-            start = start->next;
-        }
-        temp->next = start->next;
-        start->next = temp;
-    }
-}
-
-// Function to remove the top node of the priority queue
-Node *removeMin(PriorityQueueNode **head)
-{
-    Node *popped = (*head)->node;
-    (*head) = (*head)->next;
-    return popped;
-}
-
 // Function to build the Huffman tree
 Node *buildHuffmanTree(char letters[], int frequencies[], int size)
 {
-    PriorityQueueNode *priorityQueue = NULL;
-
-    // Create a leaf node for each character and add it to the priority queue
-    for (int i = 0; i < size; ++i)
+    // Create nodes for each letter-frequency pair
+    Node *nodes[size];
+    for (int i = 0; i < size; i++)
     {
-        Node *node = newNode(letters[i], frequencies[i]);
-        insert(&priorityQueue, node);
+        nodes[i] = newNode(letters[i], frequencies[i]);
     }
 
-    // Check if the priority queue is empty or has only one node
-    while (priorityQueue != NULL && priorityQueue->next != NULL)
+    // Build Huffman tree
+    while (size > 1)
     {
-        // Remove the two nodes with the lowest frequency from the priority queue
-        Node *left = removeMin(&priorityQueue);
-        Node *right = removeMin(&priorityQueue);
+        // Find the two nodes with the lowest frequencies
+        int minIndex1 = 0, minIndex2 = 1;
+        if (nodes[minIndex1]->frequency > nodes[minIndex2]->frequency)
+        {
+            int temp = minIndex1;
+            minIndex1 = minIndex2;
+            minIndex2 = temp;
+        }
+        for (int i = 2; i < size; i++)
+        {
+            if (nodes[i]->frequency < nodes[minIndex1]->frequency)
+            {
+                minIndex2 = minIndex1;
+                minIndex1 = i;
+            }
+            else if (nodes[i]->frequency < nodes[minIndex2]->frequency)
+            {
+                minIndex2 = i;
+            }
+        }
 
-        // Create a new internal node with the sum of the frequencies
-        Node *internalNode = newNode('$', left->frequency + right->frequency);
-        internalNode->left = left;
-        internalNode->right = right;
+        // Create a new internal node by merging the two nodes with lowest frequencies
+        Node *aNode = newNode('$', nodes[minIndex1]->frequency + nodes[minIndex2]->frequency);
+        aNode->left = nodes[minIndex1];
+        aNode->right = nodes[minIndex2];
 
-        // Insert the new internal node back into the priority queue
-        insert(&priorityQueue, internalNode);
+        // Remove the two nodes with lowest frequencies from the array and add the new node
+        nodes[minIndex1] = aNode;
+        nodes[minIndex2] = nodes[size - 1];
+        size--;
     }
 
-    // The remaining node in the priority queue is the root of the Huffman tree
-    Node *root = NULL;
-    if (priorityQueue != NULL)
-    {
-        root = removeMin(&priorityQueue);
-    }
-
-    return root;
+    // The root node of the Huffman tree is the only node left in the array
+    return nodes[0];
 }
 
 // Function to print Huffman codes from the Huffman tree
@@ -252,4 +220,20 @@ void freeHuffmanCodes(char **codes)
             free(codes[i]);
     }
     free(codes);
+}
+
+Node *freeTree(Node *root)
+{
+    if (!root)
+    {
+        return NULL;
+    }
+
+    root->left = freeTree(root->left);
+
+    root->right = freeTree(root->right);
+
+    free(root);
+
+    return NULL;
 }

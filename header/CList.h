@@ -18,6 +18,7 @@ void Update(list **head, char letter);
 list *swap(list *ptr1, list *ptr2);
 void bubbleSort(list **head, int count);
 void PrintList(list *head);
+list *freeList(list *head);
 #endif
 
 #ifdef CLIST_IMPLEMENTATION
@@ -34,6 +35,7 @@ bool search(list *head, char letter) // Linear Search
         curr = curr->next;
     }
 
+    free(curr);
     return false; // Letter not found
 }
 void Insert(list **head, char letter, int num)
@@ -137,5 +139,20 @@ void PrintList(list *head)
     }
 
     printf("\n");
+}
+
+list *freeList(list *head)
+{
+    list *current = head;
+    list *nextNode;
+
+    while (current != NULL)
+    {
+        nextNode = current->next;
+        free(current);
+        current = nextNode;
+    }
+
+    return NULL;
 }
 #endif

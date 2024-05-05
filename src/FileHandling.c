@@ -49,12 +49,12 @@ void traverseTree(Node *root, FILE *fp)
 {
     if (root)
     {
-        fprintf(fp, "{\\\"char\\\": \\\"%c\\\", \\\"freq\\\": \\\"%u\\\"", root->letter, root->frequency);
+        fprintf(fp, "{\\\"c\\\": \\\"%c\\\", \\\"f\\\": \\\"%u\\\"", root->letter, root->frequency);
         if (root->left || root->right)
         {
-            fprintf(fp, ", \\\"left\\\": ");
+            fprintf(fp, ", \\\"l\\\": ");
             traverseTree(root->left, fp);
-            fprintf(fp, ", \\\"right\\\": ");
+            fprintf(fp, ", \\\"r\\\": ");
             traverseTree(root->right, fp);
         }
         fprintf(fp, "}");
@@ -146,6 +146,7 @@ char *JSONmessage(char *FileName)
     // Null-terminate the result string
     result[total_bytes_read] = '\0';
 
+    free(json);
     return result;
 }
 
